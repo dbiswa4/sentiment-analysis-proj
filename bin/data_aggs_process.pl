@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+## Run Hive Script and update MySQL table
+
 use Getopt::Long;
 use DBI;
 

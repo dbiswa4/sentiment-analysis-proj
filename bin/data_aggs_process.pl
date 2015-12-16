@@ -1,7 +1,5 @@
 #!/usr/bin/perl
 
-## Run Hive Script and update MySQL table
-
 use Getopt::Long;
 use DBI;
 
@@ -65,10 +63,10 @@ open(TEMP, "$temporal_file") or die "Couldn't geo_total open file, $!";
 
 
 while(my $line = <GEOP>){
-
-        #print "GEOP line : $line\n";
-        my ($contestant, $user_location, $create_date, $count) = split ",", $line;
-        database_action($geop_qry_template,$contestant, $user_location, $create_date, $count);
+	
+	#print "GEOP line : $line\n";
+	my ($contestant, $user_location, $create_date, $count) = split ",", $line;
+	database_action($geop_qry_template,$contestant, $user_location, $create_date, $count);
 
 }
 
@@ -77,7 +75,7 @@ print "GEOP file processing done\n";
 close GEOP;
 
 while(my $line = <GEON>){
-        #print "GEON line : $line\n";
+	#print "GEON line : $line\n";
         my ($contestant, $user_location, $create_date, $count) = split ",", $line;
         database_action($geon_qry_template,$contestant, $user_location, $create_date, $count);
 
@@ -88,7 +86,7 @@ print "GEON file processing done\n";
 close GEON;
 
 while(my $line = <GEOT>){
-        #print "GEOT line : $line\n";
+	#print "GEOT line : $line\n";
         my ($contestant, $user_location, $create_date, $count) = split ",", $line;
         database_action($geot_qry_template,$contestant, $user_location, $create_date, $count);
 
@@ -114,38 +112,39 @@ close TEMP;
 clean_up();
 exit(0);
 
+####-------######
 
 #Database Update
 sub database_action{
-        print "In database_action()\n";
+	print "In database_action()\n";
 
-        my ($qry_template, $contestant, $user_location, $create_date, $count) = @_;
+	my ($qry_template, $contestant, $user_location, $create_date, $count) = @_;
 
-        if($mysql_dbh =~ /^\s*$/){
-                print "Connect to Database\n";
+	if($mysql_dbh =~ /^\s*$/){
+		print "Connect to Database\n";
 
-                $mysql_dbh = DBI->connect("DBI:mysql:$MYSQL_DATABASE;host=$MYSQL_HOSTNAME", $MYSQL_USERNAME, $MYSQL_PASSWORD, {
-                RaiseError => 0,
-                PrintError => 0
-                });
+		$mysql_dbh = DBI->connect("DBI:mysql:$MYSQL_DATABASE;host=$MYSQL_HOSTNAME", $MYSQL_USERNAME, $MYSQL_PASSWORD, {
+		RaiseError => 0,
+		PrintError => 0
+		});
+	
+		print "DBI::err : $DBI::err\n";
+		print "DBI::errstr : $DBI::errstr\n";
+	
+		print "mysql_dbh = $mysql_dbh\n";
+	}
 
-                print "DBI::err : $DBI::err\n";
-                print "DBI::errstr : $DBI::errstr\n";
+	my $qry = sprintf($qry_template, $contestant, $user_location, $create_date, $count);
 
-                print "mysql_dbh = $mysql_dbh\n";
-        }
+	print "qry to be executed : \n$qry\n";
 
-        my $qry = sprintf($qry_template, $contestant, $user_location, $create_date, $count);
+	$mysql_dbh->do($qry);
 
-        print "qry to be executed : \n$qry\n";
-
-        $mysql_dbh->do($qry);
-
-        print "After Insert query:\n";
-
-        print "DBI::err : $DBI::err\n";
+	print "After Insert query:\n";	
+	
+	print "DBI::err : $DBI::err\n";
         print "DBI::errstr : $DBI::errstr\n";
-
+	
 }
 
 ##Database Update for Temporal table
@@ -183,17 +182,15 @@ sub database_action_temp{
 
 
 sub clean_up(){
-        print "\nIn clean_up()\n";
-
-        if($mysql_dbh =~ /^\s*$/){
-                print "No Database Connection exists\n";
-        } else {
-                $mysql_dbh->disconnect;
-                print "Database Connection Closed : $mysql_dbh\n";
-        }
-
-        print "Reached end-of-program. It will End now. Bye\n";
+	print "\nIn clean_up()\n";
+ 
+	if($mysql_dbh =~ /^\s*$/){
+		print "No Database Connection exists\n";	
+	} else {
+		$mysql_dbh->disconnect;		
+		print "Database Connection Closed : $mysql_dbh\n";
+	}
+	
+	print "Reached end-of-program. It will End now. Bye\n";
 }
-
-
 

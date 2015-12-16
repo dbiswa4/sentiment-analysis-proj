@@ -7,3 +7,5 @@ echo "Starting Hillary Script"
 nohup python bin/Main_Hillary.py >> Log_Hillary.log &
 echo "Starting Trump Script"
 nohup python bin/Main_Trump.py >> Log_Trump.log &
+
+
